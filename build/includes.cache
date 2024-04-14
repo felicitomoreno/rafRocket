@@ -11,6 +11,46 @@
   },
   {
     "Sourcefile": "C:\\Users\\Admin\\Downloads\\PI 2024-1\\Arduino Code\\rocket\\build\\sketch\\rocket.ino.cpp",
+    "Include": "MPU6050.h",
+    "Includepath": "C:\\Users\\Admin\\Documents\\Arduino\\libraries\\MPU6050\\src"
+  },
+  {
+    "Sourcefile": "C:\\Users\\Admin\\Downloads\\PI 2024-1\\Arduino Code\\rocket\\build\\sketch\\rocket.ino.cpp",
+    "Include": "Wire.h",
+    "Includepath": "C:\\Users\\Admin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.11\\libraries\\Wire\\src"
+  },
+  {
+    "Sourcefile": "C:\\Users\\Admin\\Downloads\\PI 2024-1\\Arduino Code\\rocket\\build\\sketch\\rocket.ino.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\Admin\\Documents\\Arduino\\libraries\\MPU6050\\src\\I2Cdev.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\Admin\\Documents\\Arduino\\libraries\\MPU6050\\src\\MPU6050.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\Admin\\Documents\\Arduino\\libraries\\MPU6050\\src\\MPU6050_6Axis_MotionApps20.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\Admin\\Documents\\Arduino\\libraries\\MPU6050\\src\\MPU6050_6Axis_MotionApps612.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\Admin\\Documents\\Arduino\\libraries\\MPU6050\\src\\MPU6050_9Axis_MotionApps41.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\Admin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.11\\libraries\\Wire\\src\\Wire.cpp",
     "Include": "",
     "Includepath": null
   }
