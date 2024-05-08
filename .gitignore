@@ -33,3 +33,5 @@
 
 # Cache
 *.cache
+build/compile_commands.json
+rocket.ino
