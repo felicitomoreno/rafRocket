@@ -1,7 +1,7 @@
 # 1 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
 //----------------------------------------------------General---------------------------------------------------------------------
 // #include <ArduinoJSON.h>
-int ciclotrabajo = 50, TimeWithoutConnectionPermited = 15000; // en milisegundos.
+int ciclotrabajo = 50, TimeWithoutConnectionPermited = 20000; // en milisegundos.
 bool resetSensors; // Indica que deben volver a cero los valores de Rotación y aceleración.
 
 //----------------------------------------------------Connection------------------------------------------------------------------
@@ -14,7 +14,7 @@ String fetch();
 # 14 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
 const char *ssid = "ELIZABETH";
 const char *password = "sergio30900410";
-const char *ssid2 = "Canchon";
+const char *ssid2 = "CANCHON";
 const char *password2 = "12345678";
 
 WiFiClient client;
@@ -72,7 +72,7 @@ void loop()
 void espInit()
 {
   delay(TimeWithoutConnection);
-  WiFi.begin(ssid, password);
+  WiFi.begin(ssid2, password2);
   Serial.print("Conectando...");
   while (WiFi.status() != WL_CONNECTED) // Check for the connection
   {
@@ -81,7 +81,10 @@ void espInit()
     Serial.print(".");
     if (TimeWithoutConnection > TimeWithoutConnectionPermited) // Si tarda más de 15 segundos en conectarse a la primera red WiFi que se cambie a la segunda definida.
     {
-      WiFi.begin(ssid2, password2);
+      WiFi.disconnect(true);
+      WiFi.begin(ssid, password);
+      TimeWithoutConnection = 50;
+      Serial.println('Intentando conectar a ' + String(ssid2));
     }
   }
   Serial.println("Conectado con éxito a una red wifi.");
@@ -148,23 +151,26 @@ void writePins(String json)
 
   // Buscar las claves y extraer los valores
   int index = json.indexOf("\"ciclotrabajo\":") + strlen("ciclotrabajo") + 4;
-  //Serial.println(index + json);
+  Serial.println(index + json);
   if (index != -1)
   {
     ciclotrabajo = json.substring(index, json.substring(index).indexOf("\"") + index).toInt();
     Serial.println("\n\nCiclo de trabajo cambiado a " + String(ciclotrabajo) + " milisegundos\n");
   }
 
-  index = json.indexOf("\"timeWithoutConnectionPermited\":");
-  //Serial.println(index + json);
+  index = json.indexOf("\"timeWithoutConnectionPermited\":") + strlen("timeWithoutConnectionPermited") + 4;
+  Serial.println(index + json);
   if (index != -1)
   {
+    // Serial.println("json.substring(index) = " + json.substring(index));
+    // Serial.println("json.substring(index).indexOf() = " + json.substring(index).indexOf("\""));
+    // Serial.println("json.substring(index, json.substring(index).indexOf() + index) = " + json.substring(index, json.substring(index).indexOf("\"") + index));
     TimeWithoutConnectionPermited = json.substring(index, json.substring(index).indexOf("\"") + index).toInt();
     Serial.println("\n\nTiempo sin conexión cambiado a < " + String(TimeWithoutConnectionPermited) + " milisegundos\n");
   }
 
-  index = json.indexOf("\"resetSensors\":");
-  //Serial.println(index + json);
+  index = json.indexOf("\"resetSensors\":") + strlen("resetSensors") + 4;
+  Serial.println(index + json);
   if (index != -1)
   {
     resetSensors = json.substring(index, json.substring(index).indexOf("\"") + index).toInt();
