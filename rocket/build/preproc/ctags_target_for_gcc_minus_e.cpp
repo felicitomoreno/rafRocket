@@ -1,12 +1,17 @@
 # 1 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
-//-----------------------------------------Connection------------------------------------------------------------------
-/* Conecta a internet la placa */
+//----------------------------------------------------General---------------------------------------------------------------------
+// #include <ArduinoJSON.h>
+int ciclotrabajo = 50, TimeWithoutConnectionPermited = 15000; // en milisegundos.
+bool resetSensors; // Indica que deben volver a cero los valores de Rotación y aceleración.
+
+//----------------------------------------------------Connection------------------------------------------------------------------
+/* connect to red wifi */
 void espInit();
 /* Realiza la petición a servidor */
 String fetch();
 
-# 8 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
-# 9 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
+# 13 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
+# 14 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
 const char *ssid = "ELIZABETH";
 const char *password = "sergio30900410";
 const char *ssid2 = "Canchon";
@@ -16,24 +21,27 @@ WiFiClient client;
 HTTPClient http;
 String json = "";
 String dataToSend = "";
+int TimeWithoutConnection = 50;
 
-
-//--------------------------------------------------Sensor MPU6050---------------------------------------------------------------
+//----------------------------------------------------Sensor MPU6050---------------------------------------------------------------
 void MPU6050init();
 void MPU6050Run();
 
-# 25 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
-# 26 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
+# 30 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
+# 31 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
 MPU6050 sensor;
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
-int seconds, milis = 50;
+int seconds;
 
 void setup()
 {
   Serial.begin(115200);
   espInit();
   MPU6050init();
+
+  // connect to API
+  http.begin("https://rocketust.000webhostapp.com/");
 }
 
 void loop()
@@ -41,33 +49,46 @@ void loop()
   if (WiFi.status() == WL_CONNECTED)
   {
     MPU6050Run();
-    fetch("rocket", "getValues", "{}");
+    String sensorsStatus = fetch("rocket", "getSystemVar", "{}"); // Recibir datos
+    if (sensorsStatus != "")
+    {
+      writePins(sensorsStatus);
+    }
+
+    // fetch("rocket", "getValues", "{}"); // Enviar datos
   }
+  else
+  {
+    espInit();
+    // Guardar los datos que recibe del sensor localmente para luego transmitirlos.
+  }
+
+  delay(ciclotrabajo);
 }
 
 //-------------------------------------------- Definición de funciones -------------------------------------------------
 
-//-----------------------------------------Connection------------------------------------------------------------------
+//----------------------------------------------------Connection------------------------------------------------------------------
 void espInit()
 {
-  // connect to red wifi
-  delay(50);
+  delay(TimeWithoutConnection);
   WiFi.begin(ssid, password);
   Serial.print("Conectando...");
-  while (WiFi.status() != WL_CONNECTED)
-  { // Check for the connection
+  while (WiFi.status() != WL_CONNECTED) // Check for the connection
+  {
+    TimeWithoutConnection += 500;
     delay(500);
     Serial.print(".");
+    if (TimeWithoutConnection > TimeWithoutConnectionPermited) // Si tarda más de 15 segundos en conectarse a la primera red WiFi que se cambie a la segunda definida.
+    {
+      WiFi.begin(ssid2, password2);
+    }
   }
-  Serial.println("Conectado con éxito a la red wifi " + String(ssid));
-
-  // connect to API
-  http.begin("https://rocketust.000webhostapp.com/");
+  Serial.println("Conectado con éxito a una red wifi.");
 }
 
 String fetch(String module, String accion, String parameters)
 {
-  delay(4000);
   if (WiFi.status() == WL_CONNECTED) // Check WiFi connection status
   {
     json = "{\"module\":\"" + module + "\", \"accion\": \"" + accion + "\", \"parameters\": " + parameters + "}";
@@ -76,8 +97,8 @@ String fetch(String module, String accion, String parameters)
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
     int responseCode = http.POST(dataToSend); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
 
-    if (responseCode > 0)
-    { // no hubo errores al hacer la petición
+    if (responseCode > 0) // no hubo errores al hacer la petición
+    {
       Serial.println("Código HTTP ► " + String(responseCode));
       if (responseCode == 200)
       { // La API envió una respuesta
@@ -92,7 +113,8 @@ String fetch(String module, String accion, String parameters)
     else
     {
       Serial.print("Error enviando POST, código: ");
-      Serial.println(responseCode);
+      String response = http.getString();
+      Serial.println(responseCode + ' - ' + response);
     }
   }
   else
@@ -101,19 +123,60 @@ String fetch(String module, String accion, String parameters)
   }
   return "";
 }
+void writePins(String json)
+{
+  // JsonDocument doc;
+  // deserializeJson(doc, json);
 
-//--------------------------------------------------Sensor MPU6050---------------------------------------------------------------
+  // if (doc.containsKey("ciclotrabajo"))
+  // {
+  //   ciclotrabajo = atoi(doc["ciclotrabajo"]);
+  //   Serial.println("\n\nCiclo de trabajo cambiado a " + String(ciclotrabajo) + " milisegundos\n");
+  // }
+
+  // if (doc.containsKey("TimeWithoutConnectionPermited"))
+  // {
+  //   TimeWithoutConnectionPermited = atoi(doc["TimeWithoutConnectionPermited"]);
+  //   Serial.println("\n\nTiempo sin conexión cambiado a < " + String(TimeWithoutConnectionPermited) + "°c\n");
+  // }
+
+  // if (doc.containsKey("resetSensors"))
+  // {
+  //   resetSensors = atoi(doc["resetSensors"]);
+  //   Serial.println("\n\nActivar lanzamiento cambiado a > " + String(resetSensors) + "%\n");
+  // }
+
+  // Buscar las claves y extraer los valores
+  int index = json.indexOf("\"ciclotrabajo\":") + strlen("ciclotrabajo") + 4;
+  //Serial.println(index + json);
+  if (index != -1)
+  {
+    ciclotrabajo = json.substring(index, json.substring(index).indexOf("\"") + index).toInt();
+    Serial.println("\n\nCiclo de trabajo cambiado a " + String(ciclotrabajo) + " milisegundos\n");
+  }
+
+  index = json.indexOf("\"timeWithoutConnectionPermited\":");
+  //Serial.println(index + json);
+  if (index != -1)
+  {
+    TimeWithoutConnectionPermited = json.substring(index, json.substring(index).indexOf("\"") + index).toInt();
+    Serial.println("\n\nTiempo sin conexión cambiado a < " + String(TimeWithoutConnectionPermited) + " milisegundos\n");
+  }
+
+  index = json.indexOf("\"resetSensors\":");
+  //Serial.println(index + json);
+  if (index != -1)
+  {
+    resetSensors = json.substring(index, json.substring(index).indexOf("\"") + index).toInt();
+    Serial.println("\n\nActivar lanzamiento cambiado a > " + String(resetSensors) + ".\n");
+  }
+}
+
+//----------------------------------------------------Sensor MPU6050---------------------------------------------------------------
 void MPU6050init()
 {
   Wire.begin();
   sensor.initialize();
-  // espInit();
-
-  Serial.println("Hola Mundo.");
-  Serial.println();
-  Serial.println();
-  Serial.println("Seconds:");
-  Serial.println();
 
   if (sensor.testConnection())
     Serial.println("Sensor iniciado correctamente");
@@ -148,6 +211,4 @@ void MPU6050Run()
   Serial.print(gy);
   Serial.print(", Rotación z: ");
   Serial.println(gz);
-
-  delay(milis);
 }

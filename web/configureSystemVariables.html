@@ -25,44 +25,28 @@
         <div class='shelf'>
             <div class="input-group mb-3" style="margin-bottom: 10px !important;">
                 <span class="input-group-text">Ciclo de trabajo</span>
-                <span id="ciclo" class="input-group-text">1078900</span>
-                <input id="ciclo_value" placeholder="Milisegundos" type="number" class="form-control"
+                <span id="ciclotrabajo" class="input-group-text">50</span>
+                <input id="ciclotrabajo_value" placeholder="Milisegundos" type="number" class="form-control"
                     aria-label="Dollar amount (with dot and two decimal places)">
                 <button class="btn btn-outline-secondary" type="button" id="button-addon1"
-                    onclick="modifyVariables('ciclo_value', 'ciclo')">Modificar</button>
-            </div>
-            <!-- <div class="input-group mb-3">
-                <span class="input-group-text">Umbral de humedad relativa</span>
-                <span id="hr" class="input-group-text">9870</span>
-                <input id="hr_value" placeholder="%" type="number" class="form-control"
-                    aria-label="Dollar amount (with dot and two decimal places)">
-                <button class="btn btn-outline-secondary" type="button" id="button-addon1"
-                    onclick="modifyVariables('hr_value', 'humidityThreshold')">Modificar</button>
+                    onclick="modifyVariables('ciclotrabajo_value', 'ciclotrabajo')">Modificar</button>
             </div>
             <div class="input-group mb-3">
-                <span class="input-group-text">Umbral de temperatura</span>
-                <span id="temperature" class="input-group-text">2sf0</span>
-                <input id="temperature_value" placeholder="°c" type="number" class="form-control"
+                <span class="input-group-text">Tiempo sin conexión permitido</span>
+                <span id="timeWithoutConnectionPermited" class="input-group-text">15000</span>
+                <input id="timeWithoutConnectionPermited_value" placeholder="Milisegundos" type="number" class="form-control"
                     aria-label="Dollar amount (with dot and two decimal places)">
                 <button class="btn btn-outline-secondary" type="button" id="button-addon1"
-                    onclick="modifyVariables('temperature_value', 'temperatureThreshold')">Modificar</button>
+                    onclick="modifyVariables('timeWithoutConnectionPermited_value', 'timeWithoutConnectionPermited')">Modificar</button>
             </div>
             <div class="input-group mb-3">
-                <span class="input-group-text">Destapar café</span>
-                <span id="uncoverCoffee" class="input-group-text">fasdsdse</span>
-                <input id="uncoverCoffee_value" placeholder="Booleano" type="text" class="form-control"
+                <span class="input-group-text">Iniciar lanzamiento</span>
+                <span id="resetSensors" class="input-group-text">0</span>
+                <input id="resetSensors_value" placeholder="Booleano" type="number" class="form-control"
                     aria-label="Dollar amount (with dot and two decimal places)">
                 <button class="btn btn-outline-secondary" type="button" id="button-addon1"
-                    onclick="modifyVariables('uncoverCoffee_value', 'uncoverCoffee')">Modificar</button>
+                    onclick="modifyVariables('resetSensors_value', 'resetSensors')">Modificar</button>
             </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Cubrir café</span>
-                <span id="coverCoffee" class="input-group-text">falsdsdsse</span>
-                <input id="coverCoffee_value" placeholder="Booleano" type="text" class="form-control"
-                    aria-label="Dollar amount (with dot and two decimal places)">
-                <button class="btn btn-outline-secondary" type="button" id="button-addon1"
-                    onclick="modifyVariables('coverCoffee_value', 'coverCoffee')">Modificar</button>
-            </div> -->
         </div>
     </div>
 

@@ -24,13 +24,27 @@ class rocket extends Conexion
         return json_encode($response, true);
         //return $response;
     }
+    public function getSystemVar($arg)
+    { //no necesita ningun parámetro realmente.
+        $sql = "SELECT * FROM systemVar";
+        $array = $this->Conexions->connection->query($sql);
+        if (!$this->Conexions->connection->query($sql) === true) {
 
-    public function changeSensorsStatus($arg)
+            echo "\n- Error en la petición -> " . $this->connection->connect_error . "\n";
+        }
+        $response = array();
+        while ($row = $array->fetch_assoc()) {
+            array_push($response, $row);
+        }
+        //return json_encode($response, true);
+        return $response;
+    }
+    public function setSystemVar($arg)
     {
         //print_r($arg);
-        $id = $arg['id'];
-        $state = $arg['state'];
-        $sql = "UPDATE sensorsStatus SET state = '$state' WHERE id = '$id'";
+        $field = $arg['field'];
+        $value = $arg['value'];
+        $sql = "UPDATE systemVar SET $field = '$value' WHERE 1";
 
         if (!$this->Conexions->connection->query($sql)) {
             echo 'petición fallida -> ' . $this->connection->connect_error;
@@ -41,6 +55,3 @@ class rocket extends Conexion
         }
     }
 }
-
-
-?>
