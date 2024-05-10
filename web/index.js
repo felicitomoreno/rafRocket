@@ -52,10 +52,36 @@ const bringData = async () => {
                 <td scope="col">${e.pos_x}</td>
                 <td scope="col">${e.pos_y}</td>
                 <td scope="col">${e.pos_z}</td>
-                <td scope="col">${e.createdAt}</td>
+                <td scope="col">${formatDate(e.createdAt)}</td>
             </tr>
+            `
+        }
+        getLastConnection();
+    } catch (error) { console.error(error) }
+}
+
+const formatDate = (DateResponse) => {
+    let newDate = new Date(DateResponse)
+    newDate.setHours(newDate.getHours() - 5)
+    return newDate.toLocaleString()
+}
+
+
+const getLastConnection = async () => {
+    try {
+        let response = await fetchData("rocket", "getlastConnection", "{}")
+        response = JSON.parse(response)
+        console.log(response)
+        let i = 0
+        const rowTable = document.getElementById("lastConnection")
+        rowTable.innerHTML = ""
+        for (const e of response) {
+            i++
+            rowTable.innerHTML += `
+                ${formatDate(e.modifiedAt)}
             `
         }
     } catch (error) { console.error(error) }
 }
+
 bringData()

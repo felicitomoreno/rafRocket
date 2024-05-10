@@ -1,7 +1,7 @@
 # 1 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
 //----------------------------------------------------General---------------------------------------------------------------------
 // #include <ArduinoJSON.h>
-int ciclotrabajo = 50, TimeWithoutConnectionPermited = 120000, TimeForRecolectData = 20000; // en milisegundos.
+int ciclotrabajo = 50, TimeWithoutConnectionPermited = 180000, TimeForRecolectData = 20000; // en milisegundos.
 bool resetSensors, printMessages = true, connecToBegin = false; // Indica que deben volver a cero los valores de Rotación y aceleración.
 
 // const int sizeData = 100;
@@ -225,7 +225,7 @@ void writePins(String json)
   {
     resetSensors = json.substring(index, json.substring(index).indexOf("\"") + index).toInt();
     Serial.println("\n\nActivar lanzamiento cambiado a > " + String(resetSensors) + ".\n");
-    sentData();
+    // sentData();
   }
 }
 
@@ -235,6 +235,7 @@ void sentData()
   String Response;
   if (dataJson != "")
     Response = fetch("rocket", "addData", "[" + dataJson.substring(1) + "]");
+
   if (Response = "1")
   {
     dataJson = "";
@@ -302,6 +303,11 @@ void MPU6050Run()
   dx = +vx * dt;
   dy = +vy * dt;
   dz = +vz * dt;
+
+  sensor.getAcceleration(&ax, &ay, &az); //primer código, muestra hasta los 90 grados estos ángulos
+  gx = atan(ax / sqrt(pow(ay, 2) + pow(az, 2))) * (180.0 / 3.1416);
+  gy = atan(ay / sqrt(pow(ax, 2) + pow(az, 2))) * (180.0 / 3.1416);
+  gz = sqrt(pow(gx, 2) + pow(gy, 2));
 
   dataJson += ",{\"acc_x\":\"" + String(ax_m_s2) + "\",\"acc_y\":\"" + String(ay_m_s2) + "\",\"acc_z\":\"" + String(az_m_s2) + "\",\"vel_x\":\"" + String(vx) + "\",\"vel_y\":\"" + String(vy) + "\",\"vel_z\":\"" + String(vz) + "\",\"pos_x\":\"" + String(dx) + "\",\"pos_y\":\"" + String(dy) + "\",\"pos_z\":\"" + String(dz) + "\",\"rot_x\":\"" + String(gx) + "\",\"rot_y\":\"" + String(gy) + "\",\"rot_z\":\"" + String(gz) + "\"}";
   // Serial.println(dataJson);

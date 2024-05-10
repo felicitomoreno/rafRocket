@@ -130,4 +130,33 @@ class rocket extends Conexion
             return $response;
         }
     }
+
+    public function getlastConnection($arg)
+    { //no necesita ningun parámetro realmente.
+        $sql = "SELECT * FROM lastConnection WHERE id = 1";
+        $array = $this->Conexions->connection->query($sql);
+        if (!$this->Conexions->connection->query($sql) === true) {
+            echo "\n- Error en la petición -> " . $this->connection->connect_error . "\n";
+        }
+        $response = array();
+        while ($row = $array->fetch_assoc()) {
+            array_push($response, $row);
+        }
+        //return json_encode($response, true);
+        return $response;
+    }
+
+    public function setlastConnection($arg)
+    {
+        $numAleatorio = rand(1, 100);
+        $sql = "UPDATE lastConnection SET anyValue = '$numAleatorio' WHERE id = 1";
+
+        if (!$this->Conexions->connection->query($sql)) {
+            echo 'petición fallida -> ' . $this->connection->connect_error;
+            return 0;
+        } else {
+            //return '{1: 1}';
+            return 1;
+        }
+    }
 }
