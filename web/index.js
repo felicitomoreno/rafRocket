@@ -1,6 +1,6 @@
 const fetchData = (module, accion, parameters) => {
-    return new Promise( (resolve, reject) =>{
-        const url = "https://serverall.000webhostapp.com/"
+    return new Promise((resolve, reject) => {
+        const url = "https://rocketust2.000webhostapp.com/"
         const json = {
             'module': module,
             'accion': accion,
@@ -12,16 +12,16 @@ const fetchData = (module, accion, parameters) => {
         req.open("post", url)
         req.onload = () => {
             (req.status === 200)
-            ? resolve(req.responseText)
-            : reject(req.error) 
+                ? resolve(req.responseText)
+                : reject(req.error)
         }
         req.send(data)
     })
 }
 
-const bringData = async() => {
+const bringData = async () => {
     try {
-        let response = await fetchData("Ssc", "sendTemperatureAndHumidityLogs", "{}")
+        let response = await fetchData("rocket", "getLastData", "{}")
         response = JSON.parse(response)
         console.log(response)
         let i = 0
@@ -30,11 +30,29 @@ const bringData = async() => {
         for (const e of response) {
             i++
             rowTable.innerHTML += `
-            <tr >
+            <!--<tr >
                 <th scope="row">${i}</th>
                 <td>${e.temperature}</td>
                 <td>${e.humidity}</td>
                 <td>${e.date}</td>
+            </tr>-->
+
+
+            <tr>
+                <th scope="row">${i}</th>
+                <td scope="col">${e.rot_x}</td>
+                <td scope="col">${e.rot_y}</td>
+                <td scope="col">${e.rot_z}</td>
+                <td scope="col">${e.acc_x}</td>
+                <td scope="col">${e.acc_y}</td>
+                <td scope="col">${e.acc_z}</td>
+                <td scope="col">${e.vel_x}</td>
+                <td scope="col">${e.vel_y}</td>
+                <td scope="col">${e.vel_z}</td>    
+                <td scope="col">${e.pos_x}</td>
+                <td scope="col">${e.pos_y}</td>
+                <td scope="col">${e.pos_z}</td>
+                <td scope="col">${e.createdAt}</td>
             </tr>
             `
         }

@@ -24,21 +24,31 @@
     <div class='principal'>
         <div class='shelf'>
 
-            <div class="card" style="width: 60%;">
-                <div class="card-header" style="text-align: center  ;">
+            <div class="card" style="width: fit-content;">
+                <div class="card-header" style="text-align: center; ">
                     Últimos registros
                     <button style="margin-left: 20px;" type="button" class="btn btn-outline-success"
                         onclick="bringData()">Actualizar</button>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <table class="table table-striped table-hover">
+                <ul class="list-group list-group-flush" style="width: fit-content; padding: 15px;">
+                    <li class="list-group-item" style="width: fit-content;">
+                        <table class="table table-striped table-hover" style="width: fit-content; scroll-margin-left: -30px;">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Rotación</th>
-                                    <th scope="col">Posición</th>
-                                    <th scope="col">fecha (GMT, UTC +0)</th>
+                                    <th scope="col">Rotación x</th>
+                                    <th scope="col">Rotación y</th>
+                                    <th scope="col">Rotación z</th>
+                                    <th scope="col">Aceleración x</th>
+                                    <th scope="col">Aceleración y</th>
+                                    <th scope="col">Aceleración z</th>
+                                    <th scope="col">Velocidad x</th>
+                                    <th scope="col">Velocidad y</th>
+                                    <th scope="col">Velocidad z</th>    
+                                    <th scope="col">Posición x</th>
+                                    <th scope="col">Posición y</th>
+                                    <th scope="col">Posición z</th>
+                                    <th scope="col">Fecha UTC-5</th>
                                 </tr>
                             </thead>
                             <tbody id="row_table">
@@ -62,7 +72,7 @@
             .catch(error => console.error('Error al cargar el footer:', error));
     </script>
 
-    <!-- <script defer src='./index.js'></script> -->
+    <script defer src='./index.js'></script>
 </body>
 
 </html>
