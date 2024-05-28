@@ -8,7 +8,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: linear-gradient(128deg, rgb(204, 201, 189), rgb(175, 151, 121));
+  background: linear-gradient(to bottom right, #006769, #40A578);
 }
 
 .principal {
@@ -149,3 +149,9 @@ body {
   background-color: black;
   padding: 1%;
 } */
+.color1{
+  background-color: #FAEED1;
+}
+.color2{
+  background-color: #DED0B6;
+}

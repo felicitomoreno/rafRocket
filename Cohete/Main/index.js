@@ -39,19 +39,19 @@ const bringData = async () => {
 
 
             <tr>
-                <td scope="col">${formatDate(e.createdAt)}</td>
-                <td scope="col">${e.acc_x}</td>
-                <td scope="col">${e.acc_y}</td>
-                <td scope="col">${e.acc_z}</td>
-                <td scope="col">${e.vel_x}</td>
-                <td scope="col">${e.vel_y}</td>
-                <td scope="col">${e.vel_z}</td>    
-                <td scope="col">${e.pos_x}</td>
-                <td scope="col">${e.pos_y}</td>
-                <td scope="col">${e.pos_z}</td>
-                <td scope="col">${e.rot_x}</td>
-                <td scope="col">${e.rot_y}</td>
-                <td scope="col">${e.rot_z}</td>
+                <td class="color1" scope="col">${formatDate(e.createdAt)}</td>
+                <td class="color2" scope="col">${e.acc_x}</td>
+                <td class="color1" scope="col">${e.acc_y}</td>
+                <td class="color2" scope="col">${e.acc_z}</td>
+                <td class="color1" scope="col">${e.vel_x}</td>
+                <td class="color2" scope="col">${e.vel_y}</td>
+                <td class="color1" scope="col">${e.vel_z}</td>    
+                <td class="color2" scope="col">${e.pos_x}</td>
+                <td class="color1" scope="col">${e.pos_y}</td>
+                <td class="color2" scope="col">${e.pos_z}</td>
+                <td class="color1" scope="col">${e.rot_x}</td>
+                <td class="color2" scope="col">${e.rot_y}</td>
+                <td class="color1" scope="col">${e.rot_z}</td>
             </tr>
             `
         }
@@ -61,8 +61,8 @@ const bringData = async () => {
 
 const formatDate = (DateResponse) => {
     let newDate = new Date(DateResponse)
-    newDate.setHours(newDate.getHours() - 5)
-    return newDate.toDateString() + newDate.toTimeString()
+    newDate.setHours(newDate.getHours())
+    return String(newDate.toDateString() + ' - ' + newDate.toTimeString())
 }
 
 
