@@ -20,13 +20,13 @@ String fetch();
 
 #include <HTTPClient.h>
 #include <WiFi.h>
-const char *ssid2 = "ELIZABETH";
-const char *password2 = "sergio30900410";
+const char *ssid2 = "RAFAEL";
+const char *password2 = "12345678A";
 // const char *ssid = "CANCHON";
 // const char *password = "12345678";
 const char *ssid = "USTA_Estudiantes";
 const char *password = "#soytomasino";
-#define url "https://rocketust2.000webhostapp.com/"
+#define url "https://rafrocketust.000webhostapp.com/"
 WiFiClient client;
 HTTPClient http;
 HTTPClient httpData;
