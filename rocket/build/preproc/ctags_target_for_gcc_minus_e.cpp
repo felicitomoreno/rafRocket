@@ -2,9 +2,10 @@
 //----------------------------------------------------General---------------------------------------------------------------------
 // #include <ArduinoJSON.h>
 void (*resetFunc)(void) = 0;
+void RecolectAndSentData();
 
-int ciclotrabajo = 300, TimeWithoutConnectionPermited = 180000, TimeForRecolectData = 25000, timeForUpgradeVar = 5000, Retrazo_sentData = 5000; // en milisegundos.
-bool resetSensors, printMessages = true, connecToBegin = false, DisableSerial; // Indica que deben volver a cero los valores de Rotación y aceleración.
+int ciclotrabajo = 50, TimeWithoutConnectionPermited = 180000, TimeForRecolectData = 25000, timeForUpgradeVar = 5000, Retrazo_sentData = 5000; // en milisegundos.
+bool resetSensors, printMessages = true, connecToBegin = true, DisableSerial, DataJsonContruido; // Indica que deben volver a cero los valores de Rotación y aceleración.
 
 // const int sizeData = 100;
 int tiempotranscurrido, millisInt, tiempotranscurrido_UpgradeVar;
@@ -16,14 +17,14 @@ void espInit();
 /* Realiza la petición a servidor */
 String fetch();
 
-# 19 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
 # 20 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
-const char *ssid = "ELIZABETH";
-const char *password = "sergio30900410";
+# 21 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
+const char *ssid2 = "ELIZABETH";
+const char *password2 = "sergio30900410";
 // const char *ssid = "CANCHON";
 // const char *password = "12345678";
-const char *ssid2 = "USTA_Estudiantes";
-const char *password2 = "#soytomasino";
+const char *ssid = "USTA_Estudiantes";
+const char *password = "#soytomasino";
 
 WiFiClient client;
 HTTPClient http;
@@ -36,8 +37,8 @@ void MPU6050init();
 /* Recolecta información */
 void MPU6050Run();
 
-# 39 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
 # 40 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
+# 41 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino" 2
 MPU6050 sensor;
 int16_t ax, ay, az;
 int16_t gx, gy, gz;
@@ -55,6 +56,8 @@ void setup()
  MPU6050init();
  // connect to API
  http.begin("https://rocketust2.000webhostapp.com/");
+
+ dataJson.reserve(600000);
 }
 
 void loop()
@@ -63,38 +66,30 @@ void loop()
  {
   // Serial.println("TimeForRecolectData: " + String(TimeForRecolectData));
   // Serial.println("tiempotranscurrido: " + String(tiempotranscurrido));
-  // Serial.println("millisInt: " + String(millisInt));
-  Serial.println("TimeForRecolectData + tiempotranscurrido - millisInt: " + String(TimeForRecolectData + tiempotranscurrido - millisInt) + "\"");
+  Serial.println("Tiempo transcurrido: " + String(millisInt / 1000) + "seg.");
+  // Serial.println("TimeForRecolectData + tiempotranscurrido - millisInt: " + String(TimeForRecolectData + tiempotranscurrido - millisInt) + "\"");
  }
 
  millisInt = millis();
 
  if (WiFi.status() == WL_CONNECTED)
  {
-  MPU6050Run();
   if ((timeForUpgradeVar + tiempotranscurrido_UpgradeVar - millisInt) < 0)
   {
-   tiempotranscurrido_UpgradeVar = millis();
+   delay(500);
+   String response = fetch("rocket", "setlastConnection", "{}"); // Comunicar la última conexión de la placa
+   delay(2000);
    String sensorsStatus = fetch("rocket", "getSystemVar", "{}"); // Recibir datos
+
    if (sensorsStatus != "")
     writePins(sensorsStatus);
 
-   String response = fetch("rocket", "setlastConnection", "{}"); // Comunicar la última conexión de la placa
-  }
-
-  if ((TimeForRecolectData + tiempotranscurrido - millisInt) < 0) // La idea es que haya un tiempo prudente para recolectar datos antes de iniciar una conexión a internet.
-  {
-   sentData();
+   tiempotranscurrido_UpgradeVar = millis();
   }
  }
  else
  {
-  if ((TimeForRecolectData + tiempotranscurrido - millisInt) < 0) // La idea es que haya un tiempo prudente para recolectar datos antes de iniciar una conexión a internet.
-  {
-   espInit();
-   sentData();
-  }
-  MPU6050Run();
+  espInit();
  }
 
  delay(ciclotrabajo);
@@ -108,7 +103,7 @@ void espInit()
  delay(TimeWithoutConnection);
  WiFi.begin(ssid2, password2);
  if (printMessages)
-  Serial.print("Conectando...");
+  Serial.print("Conectando a " + String(ssid2) + " ...");
  bool cambioRed = true;
  while (WiFi.status() != WL_CONNECTED) // Check for the connection
  {
@@ -148,11 +143,12 @@ String fetch(String module, String accion, String parameters)
   dataToSend = "json={\"module\":\"" + module + "\", \"accion\": \"" + accion + "\", \"parameters\": " + parameters + "}";
   if (parameters.length() > 200)
    delay(Retrazo_sentData);
+
   if (printMessages)
    Serial.println("\nDatos a enviar: " + String(dataToSend));
 
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-  int responseCode = http.POST(dataToSend); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
+  int responseCode = http.POST("json={\"module\": \"rocket\", \"accion\": \"setSystemvar\", \"parameters\": {\"field\": \"resetSensors\", \"value\": \"0\"}}"); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
   if (parameters.length() > 200)
    delay(Retrazo_sentData);
 
@@ -177,10 +173,13 @@ String fetch(String module, String accion, String parameters)
   else
   {
    String response = http.getString();
+   http.end();
+
    if (printMessages)
    {
     Serial.print("Error enviando POST, código: ");
-    Serial.println(String(responseCode) + ' - ' + response);
+    Serial.println(String(responseCode));
+    Serial.println(response);
    }
   }
  }
@@ -240,9 +239,7 @@ void writePins(String json)
 
    if (resetSensors)
    {
-    resetFunc();
-    delay(5000);
-    MPU6050init();
+    RecolectAndSentData();
    }
   }
  }
@@ -266,30 +263,76 @@ void writePins(String json)
 }
 
 /* Emitir datos al servidor */
-void sentData()
+String sentData()
 {
- String Response;
- if (printMessages)
- {
-  Serial.println("\nIngreso al sentData.");
-  // Serial.println(dataJson);
- }
+ // if (printMessages)
+ // 		Serial.println("Ingreso a sentData");
 
- if (dataJson != "")
+ if (WiFi.status() == WL_CONNECTED) // Check WiFi connection status
  {
-  String parameters = "[" + dataJson + "]";
-  delay(Retrazo_sentData);
-  Response = fetch("rocket", "addData", parameters);
-  delay(Retrazo_sentData);
-  tiempotranscurrido = millis();
+  // if (printMessages)
+  // {
+  // 	Serial.println("\nIngreso al sentData.");
+  // 	Serial.println(dataJson);
+  // }
 
-  if (Response = "1")
+  if (not DataJsonContruido)
   {
-   dataJson = "";
+   if (dataJson != "")
+   {
+    delay(2000);
+    dataJson += "]}";
+    delay(2000);
+   }
+   DataJsonContruido = true;
+  }
+  delay(3000);
+
+  if (printMessages)
+   Serial.print("\nDataJsonContruido -> Datos a enviar: ");
+   Serial.println(dataJson);
+
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.setTimeout(20000);
+  int responseCode = http.POST("json={\"module\": \"rocket\", \"accion\": \"setSystemvar\", \"parameters\": {\"field\": \"resetSensors\", \"value\": \"0\"}}"); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
+  // int responseCode = http.POST("json={\"module\": \"rocket\", \"accion\": \"getLastData\", \"parameters\": {}}"); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
+  delay(5000);
+
+  if (responseCode > 0) // no hubo errores al hacer la petición
+  {
    if (printMessages)
-    Serial.println("DataJson reseteado");
+    Serial.println("Código HTTP ► " + String(responseCode));
+
+   if (responseCode == 200) // La API envió una respuesta
+   {
+    String response = http.getString();
+    if (printMessages)
+    {
+     Serial.println("El servidor respondió ▼ ");
+     Serial.println(response + "▼");
+     Serial.println("------------------");
+    }
+    http.end();
+    return response;
+   }
+  }
+  else
+  {
+   String response = http.getString();
+   if (printMessages)
+   {
+    Serial.print("Error enviando POST, código: ");
+    Serial.println(String(responseCode));
+    Serial.println(response);
+   }
   }
  }
+ else
+ {
+  if (printMessages)
+   Serial.println("\nError en la conexión WIFI");
+ }
+ return "";
 }
 
 //----------------------------------------------------Sensor MPU6050---------------------------------------------------------------
@@ -336,20 +379,20 @@ void MPU6050Run()
  {
   // Serial.println("menor al sice-------------------------------------------------");
   if (dataJson == "")
-   dataJson += "{\"acc_x\":\"" + String(ax_m_s2) + "\",\"acc_y\":\"" + String(ay_m_s2) + "\",\"acc_z\":\"" + String(az_m_s2) + "\",\"vel_x\":\"" + String(vx) + "\",\"vel_y\":\"" + String(vy) + "\",\"vel_z\":\"" + String(vz) + "\",\"pos_x\":\"" + String(dx) + "\",\"pos_y\":\"" + String(dy) + "\",\"pos_z\":\"" + String(dz) + "\",\"rot_x\":\"" + String(gx) + "\",\"rot_y\":\"" + String(gy) + "\",\"rot_z\":\"" + String(gz) + "\"}";
+   dataJson += "json={\"module\":\"rocket\", \"accion\": \"addData\", \"parameters\": [{\"acc_x\":\"" + String(ax_m_s2) + "\",\"acc_y\":\"" + String(ay_m_s2) + "\",\"acc_z\":\"" + String(az_m_s2) + "\",\"vel_x\":\"" + String(vx) + "\",\"vel_y\":\"" + String(vy) + "\",\"vel_z\":\"" + String(vz) + "\",\"pos_x\":\"" + String(dx) + "\",\"pos_y\":\"" + String(dy) + "\",\"pos_z\":\"" + String(dz) + "\",\"rot_x\":\"" + String(gx) + "\",\"rot_y\":\"" + String(gy) + "\",\"rot_z\":\"" + String(gz) + "\"}";
   else
    dataJson += ",{\"acc_x\":\"" + String(ax_m_s2) + "\",\"acc_y\":\"" + String(ay_m_s2) + "\",\"acc_z\":\"" + String(az_m_s2) + "\",\"vel_x\":\"" + String(vx) + "\",\"vel_y\":\"" + String(vy) + "\",\"vel_z\":\"" + String(vz) + "\",\"pos_x\":\"" + String(dx) + "\",\"pos_y\":\"" + String(dy) + "\",\"pos_z\":\"" + String(dz) + "\",\"rot_x\":\"" + String(gx) + "\",\"rot_y\":\"" + String(gy) + "\",\"rot_z\":\"" + String(gz) + "\"}";
  }
- else
- {
-  if (WiFi.status() == WL_CONNECTED)
-   sentData();
-  else
-  {
-   espInit();
-   sentData();
-  }
- }
+ // else
+ // {
+ // 	if (WiFi.status() == WL_CONNECTED)
+ // 		sentData();
+ // 	else
+ // 	{
+ // 		espInit();
+ // 		sentData();
+ // 	}
+ // }
  // if(printMessages)
  // Serial.println(dataJson);
 
@@ -368,4 +411,53 @@ void MPU6050Run()
   Serial.println("dy: " + String(dy));
   Serial.println("dz: " + String(dz));
  }
+}
+
+void RecolectAndSentData() // La conexión a internet debe estar bien.
+{
+ if (printMessages)
+  Serial.println("Ingreso a RecolectAndSentData " + String(TimeForRecolectData + tiempotranscurrido - millisInt));
+
+ tiempotranscurrido = millisInt;
+
+ while ((TimeForRecolectData + tiempotranscurrido - millisInt) > 0) // La idea es que haya un tiempo prudente para recolectar datos antes de enviar datos.
+ {
+  if (printMessages)
+   Serial.println("Recolectando data. " + String(TimeForRecolectData + tiempotranscurrido - millisInt));
+
+  millisInt = millis();
+  MPU6050Run();
+  delay(150);
+ }
+
+ String Response;
+ while (Response != "1") // Intenta enviar los datos al servidor hasta que se envíen
+ {
+  if (WiFi.status() == WL_CONNECTED)
+  {
+   Response = sentData();
+   delay(3000);
+
+   String responsesetlastConnection_ = fetch("rocket", "setlastConnection", "{}"); // Comunicar la última conexión de la placa
+   Serial.println("While -> Response != 1");
+
+   // if (printMessages)
+   // 	Serial.println(Response);
+
+   if (Response == "1")
+   {
+    dataJson = "";
+
+    tiempotranscurrido = millis();
+    if (printMessages)
+     Serial.println("DataJson reseteado");
+   }
+  }
+  else
+  {
+   espInit();
+  }
+ }
+
+ String response_resetSensors = fetch("rocket", "setSystemvar", "{\"field\": \"resetSensors\", \"value\": \"0\"}"); // Resetear el lanzamiento - No enviar lanzamiento.
 }
