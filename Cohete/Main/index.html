@@ -20,23 +20,32 @@
             })
             .catch(error => console.error('Error al cargar el header:', error));
     </script>
+    
+    <div class="input-group mb-3" style="width: 70%; align-content: center;">
+        <span class="input-group-text">Iniciar lanzamiento</span>
+        <span id="resetSensors" class="input-group-text">0</span>
+        <input id="resetSensors_value" placeholder="Booleano" type="number" class="form-control"
+            aria-label="Dollar amount (with dot and two decimal places)">
+        <button class="btn btn-primary" type="button" id="button-addon1"
+            onclick="modifyVariables('resetSensors_value', 'resetSensors')">Modificar</button>
+    </div>
 
     <div class='principal'>
-        <div class='shelf'>
+        <div class=''>
 
-            <div class="card" style="width: fit-content;">
-                <div class="card-header" style="text-align: center; ">
+            <div class="" style="width: fit-content;">
+                <div class="" style="text-align: center; ">
                     Últimos registros
                     <button style="margin-left: 20px;" type="button" class="btn btn-outline-success"
                         onclick="bringData()">Actualizar</button>
                 </div>
-                <div class="card-header" style="text-align: center; ">
+                <div class="" style="text-align: center; ">
                     Última conexión <p id="lastConnection"> 5/10/2024, 7:41:16 AM</p>
                     
                 </div>
-                <ul class="list-group list-group-flush" style="width: fit-content; padding: 15px;">
-                    <li class="list-group-item" style="width: fit-content;">
-                        <table class="table table-striped table-hover" style="width: fit-content; scroll-margin-left: -30px;">
+                <ul  style="width: fit-content; padding: 15px;">
+                    <li class="" style="width: fit-content;">
+                        <table class="" style="width: fit-content; scroll-margin-left: -30px;">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -77,6 +86,8 @@
     </script>
 
     <script defer src='./index.js'></script>
+    <script defer src='./configureSystemVariables.js'></script>
+
 </body>
 
 </html>
