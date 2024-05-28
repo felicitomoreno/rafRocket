@@ -24,7 +24,7 @@ const modifyVariables = async (value, name) => {
         const valueToChange = document.getElementById(value).value
         const parameters = {
             "field": name,
-            "value": valueToChange
+            "value": 1
         }
         let response = await fetchData("rocket", "setSystemvar", parameters)
         getData()

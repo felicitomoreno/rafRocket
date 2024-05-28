@@ -4,8 +4,8 @@
     <meta charset='UTF-8'>
     <title></title>
     <link rel='stylesheet' href='./index.css'>
-        <!-- bootstrap -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    <!-- bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 </head>
 
@@ -20,48 +20,46 @@
             })
             .catch(error => console.error('Error al cargar el header:', error));
     </script>
-    
-    <div class="input-group mb-3" style="width: 70%; align-content: center;">
-        <span class="input-group-text">Iniciar lanzamiento</span>
-        <span id="resetSensors" class="input-group-text">0</span>
-        <input id="resetSensors_value" placeholder="Booleano" type="number" class="form-control"
-            aria-label="Dollar amount (with dot and two decimal places)">
-        <button class="btn btn-primary" type="button" id="button-addon1"
-            onclick="modifyVariables('resetSensors_value', 'resetSensors')">Modificar</button>
-    </div>
 
+    <div style="display: flex; flex-direction: row; text-align: center; margin: 25px;">
+
+        <div class="btn-group" style="text-align: start;">
+
+            <button style="margin-left: 20px;" type="button" class="btn btn-secondary btn-primary"
+                onclick="bringData()">Actualizar datos</button>
+
+            <button class="btn btn-secondary btn-primary" type="button" id="button-addon1"
+                onclick="modifyVariables('resetSensors_value', 'resetSensors')">Lanzar Cohete</button>
+        </div>
+
+        <div class="" style="text-align: start; padding-left: 25px; display: flex; flex-direction: row;">
+            <p id="lastConnection"> Última vez conectado: 2024-05-25, 13:18</p> <p id="resetSensors" ></p>
+        </div>
+
+    </div>
     <div class='principal'>
         <div class=''>
 
             <div class="" style="width: fit-content;">
-                <div class="" style="text-align: center; ">
-                    Últimos registros
-                    <button style="margin-left: 20px;" type="button" class="btn btn-outline-success"
-                        onclick="bringData()">Actualizar</button>
-                </div>
-                <div class="" style="text-align: center; ">
-                    Última conexión <p id="lastConnection"> 5/10/2024, 7:41:16 AM</p>
-                    
-                </div>
-                <ul  style="width: fit-content; padding: 15px;">
-                    <li class="" style="width: fit-content;">
-                        <table class="" style="width: fit-content; scroll-margin-left: -30px;">
+                <ul style="width: fit-content; padding: 15px;">
+                    <li class=".table-dark" style="width: fit-content;">
+                        <table class="table table-bordered table-hover"
+                            style="width: fit-content; scroll-margin-left: -30px;">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Rotación x</th>
-                                    <th scope="col">Rotación y</th>
-                                    <th scope="col">Rotación z</th>
-                                    <th scope="col">Aceleración x</th>
-                                    <th scope="col">Aceleración y</th>
-                                    <th scope="col">Aceleración z</th>
-                                    <th scope="col">Velocidad x</th>
-                                    <th scope="col">Velocidad y</th>
-                                    <th scope="col">Velocidad z</th>    
-                                    <th scope="col">Posición x</th>
-                                    <th scope="col">Posición y</th>
-                                    <th scope="col">Posición z</th>
-                                    <th scope="col">Fecha UTC-5</th>
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Ace. x</th>
+                                    <th scope="col">Ace. y</th>
+                                    <th scope="col">Ace. z</th>
+                                    <th scope="col">Vel. x</th>
+                                    <th scope="col">Vel. y</th>
+                                    <th scope="col">Vel. z</th>
+                                    <th scope="col">Pos. x</th>
+                                    <th scope="col">Pos. y</th>
+                                    <th scope="col">Pos. z</th>
+                                    <th scope="col">Rot. x</th>
+                                    <th scope="col">Rot. y</th>
+                                    <th scope="col">Rot. z</th>
                                 </tr>
                             </thead>
                             <tbody id="row_table">
