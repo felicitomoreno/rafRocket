@@ -1,6 +1,6 @@
 const fetchData = (module, accion, parameters) => {
     return new Promise((resolve, reject) => {
-        const url = "https://rocketust2.000webhostapp.com/"
+        const url = "https://rafrocketust.000webhostapp.com/"
         const json = {
             'module': module,
             'accion': accion,

@@ -1,32 +1,11 @@
-const fetchData = (module, accion, parameters) => {
-    return new Promise((resolve, reject) => {
-        const url = "https://rocketust2.000webhostapp.com/"
-        const json = {
-            'module': module,
-            'accion': accion,
-            'parameters': parameters,
-        }
-        const data = new FormData()
-        data.append('json', JSON.stringify(json))
-        const req = new XMLHttpRequest()
-        req.open("post", url)
-        req.onload = () => {
-            (req.status === 200)
-                ? resolve(req.responseText)
-                : reject(req.error)
-        }
-        req.send(data)
-    })
-}
-
 const getData = async () => {
     try {
         let response = await fetchData("rocket", "getSystemvar", "{}")
         response = JSON.parse(response)
         console.log(response)
         let arrayInputs = {
-            "ciclotrabajo": document.getElementById("ciclotrabajo"),
-            "timeWithoutConnectionPermited": document.getElementById("timeWithoutConnectionPermited"),
+            // "ciclotrabajo": document.getElementById("ciclotrabajo"),
+            // "timeWithoutConnectionPermited": document.getElementById("timeWithoutConnectionPermited"),
             "resetSensors": document.getElementById("resetSensors"),
         }
         console.log(arrayInputs);
