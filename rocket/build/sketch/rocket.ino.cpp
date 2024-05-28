@@ -6,7 +6,7 @@ void (*resetFunc)(void) = 0;
 void RecolectAndSentData();
 
 int ciclotrabajo = 50, TimeWithoutConnectionPermited = 180000, TimeForRecolectData = 25000, timeForUpgradeVar = 5000, Retrazo_sentData = 5000; // en milisegundos.
-bool resetSensors, printMessages = true, connecToBegin = true, DisableSerial, DataJsonContruido;											  // Indica que deben volver a cero los valores de Rotación y aceleración.
+bool resetSensors, printMessages = true, connecToBegin = true, DisableSerial, DataJsonContruido;											   // Indica que deben volver a cero los valores de Rotación y aceleración.
 
 // const int sizeData = 100;
 int tiempotranscurrido, millisInt, tiempotranscurrido_UpgradeVar;
@@ -29,6 +29,7 @@ const char *password = "#soytomasino";
 #define url "https://rocketust2.000webhostapp.com/"
 WiFiClient client;
 HTTPClient http;
+HTTPClient httpData;
 String dataToSend = "";
 int TimeWithoutConnection = 50;
 
@@ -48,17 +49,17 @@ float dx, dy, dz;
 
 int seconds;
 
-#line 49 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
+#line 50 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
 void setup();
-#line 62 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
+#line 64 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
 void loop();
-#line 138 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
+#line 140 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
 String fetch(String module, String accion, String parameters);
-#line 193 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
+#line 195 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
 void writePins(String json);
-#line 265 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
+#line 269 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
 String sentData();
-#line 49 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
+#line 50 "M:\\U\\U 2024-1\\PI 2024-1\\Arduino Code\\rocket\\rocket.ino"
 void setup()
 {
 	// if (Serial.available() > 0)
@@ -68,6 +69,7 @@ void setup()
 	MPU6050init();
 	// connect to API
 	http.begin(url);
+	httpData.begin(url);
 
 	dataJson.reserve(600000);
 }
@@ -160,7 +162,7 @@ String fetch(String module, String accion, String parameters)
 			Serial.println("\nDatos a enviar: " + String(dataToSend));
 
 		http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-		int responseCode = http.POST("json={\"module\": \"rocket\", \"accion\": \"setSystemvar\", \"parameters\": {\"field\": \"resetSensors\", \"value\": \"0\"}}"); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
+		int responseCode = http.POST(dataToSend); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
 		if (parameters.length() > 200)
 			delay(Retrazo_sentData);
 
@@ -212,12 +214,14 @@ void writePins(String json)
 	if (index != -1)
 	{
 		int ciclotrabajo_Response = json.substring(index, json.substring(index).indexOf("\"") + index).toInt();
-		if (ciclotrabajo != ciclotrabajo_Response)
+		if (ciclotrabajo < ciclotrabajo_Response)
 		{
-			ciclotrabajo = ciclotrabajo_Response;
-
 			if (printMessages)
-				Serial.println("\nCiclo de trabajo cambiado a " + String(ciclotrabajo) + " milisegundos");
+				Serial.println("Reseteando sistema....");
+			resetFunc();
+
+			// if (printMessages)
+			// 	Serial.println("\nCiclo de trabajo cambiado a " + String(ciclotrabajo) + " milisegundos");
 		}
 	}
 
@@ -282,6 +286,8 @@ String sentData()
 
 	if (WiFi.status() == WL_CONNECTED) // Check WiFi connection status
 	{
+		httpData.end();
+
 		// if (printMessages)
 		// {
 		// 	Serial.println("\nIngreso al sentData.");
@@ -301,13 +307,17 @@ String sentData()
 		delay(3000);
 
 		if (printMessages)
+		{
 			Serial.print("\nDataJsonContruido -> Datos a enviar: ");
 			Serial.println(dataJson);
+		}
 
-		http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-		http.setTimeout(20000);
-		int responseCode = http.POST("json={\"module\": \"rocket\", \"accion\": \"setSystemvar\", \"parameters\": {\"field\": \"resetSensors\", \"value\": \"0\"}}"); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
-		// int responseCode = http.POST("json={\"module\": \"rocket\", \"accion\": \"getLastData\", \"parameters\": {}}"); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
+		delay(5000);
+
+		httpData.addHeader("Content-Type", "application/x-www-form-urlencoded");
+		httpData.setTimeout(20000);
+		int responseCode = httpData.POST(dataJson); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
+		// int responseCode = httpData.POST("json={\"module\": \"rocket\", \"accion\": \"getLastData\", \"parameters\": {}}"); // Enviamos el post pasándole los datos que queremos enviar. retorna un código http
 		delay(5000);
 
 		if (responseCode > 0) // no hubo errores al hacer la petición
@@ -317,26 +327,29 @@ String sentData()
 
 			if (responseCode == 200) // La API envió una respuesta
 			{
-				String response = http.getString();
+				String response = httpData.getString();
 				if (printMessages)
 				{
 					Serial.println("El servidor respondió ▼ ");
 					Serial.println(response + "▼");
 					Serial.println("------------------");
 				}
-				http.end();
+				httpData.end();
 				return response;
 			}
 		}
 		else
 		{
-			String response = http.getString();
+			String response = httpData.getString();
+			httpData.end();
+
 			if (printMessages)
 			{
 				Serial.print("Error enviando POST, código: ");
 				Serial.println(String(responseCode));
 				Serial.println(response);
 			}
+			return "";
 		}
 	}
 	else
@@ -431,6 +444,7 @@ void RecolectAndSentData() // La conexión a internet debe estar bien.
 		Serial.println("Ingreso a RecolectAndSentData " + String(TimeForRecolectData + tiempotranscurrido - millisInt));
 
 	tiempotranscurrido = millisInt;
+	DataJsonContruido = false;
 
 	while ((TimeForRecolectData + tiempotranscurrido - millisInt) > 0) // La idea es que haya un tiempo prudente para recolectar datos antes de enviar datos.
 	{
@@ -466,10 +480,21 @@ void RecolectAndSentData() // La conexión a internet debe estar bien.
 			}
 		}
 		else
-		{
 			espInit();
-		}
 	}
 
-	String response_resetSensors = fetch("rocket", "setSystemvar", "{\"field\": \"resetSensors\", \"value\": \"0\"}"); // Resetear el lanzamiento - No enviar lanzamiento.
+	String response_resetSensors;
+	while (response_resetSensors != "1") // Intenta enviar los datos al servidor hasta que se envíen
+	{
+		if (WiFi.status() == WL_CONNECTED)
+		{
+			response_resetSensors = fetch("rocket", "setSystemvar", "{\"field\": \"resetSensors\", \"value\": \"0\"}"); // Resetear el lanzamiento - No enviar lanzamiento.
+			delay(3000);
+
+			String responsesetlastConnection_ = fetch("rocket", "setlastConnection", "{}"); // Comunicar la última conexión de la placa
+			Serial.println("While -> response_resetSensors != 1");
+		}
+		else
+			espInit();
+	}
 }
