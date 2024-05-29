@@ -61,7 +61,7 @@ const bringData = async () => {
 
 const formatDate = (DateResponse) => {
     let newDate = new Date(DateResponse)
-    newDate.setHours(newDate.getHours())
+    newDate.setHours(newDate.getHours() - 5)
     return String(newDate.toDateString() + ' - ' + newDate.toTimeString())
 }
 
